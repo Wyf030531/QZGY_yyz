@@ -23,8 +23,11 @@ from shapely.geometry import shape, mapping
 # 1. 路径配置
 # =========================
 base_dir = r"F:\wyf\数据存储\组内数据\严艳梓老师合作论文相关\data"
-shp_path = r"F:\wyf\数据存储\组内数据\严艳梓老师合作论文相关\data\fanwei\QZGY.shp"
-result_dir = r"F:\wyf\数据存储\组内数据\严艳梓老师合作论文相关\data\result"
+# exdorheic0  外流河  endorheic0   内流河
+shp_path = r"F:F:\wyf\数据存储\组内数据\严艳梓老师合作论文相关\basin\exdorheic0.shp"
+# shp_path = r"F:\wyf\数据存储\组内数据\严艳梓老师合作论文相关\basin\basin.shp"
+# result_dir = r"F:\wyf\数据存储\组内数据\严艳梓老师合作论文相关\data\result"
+result_dir = r"F:\wyf\数据存储\组内数据\严艳梓老师合作论文相关\data\exdorheic"
 
 # 分辨率列表
 resolutions = ["10m", "5m", "2.5m", "30s"]
