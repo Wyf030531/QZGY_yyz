@@ -240,7 +240,7 @@ def process_one_variable(res_name, var_code, var_cn, shp_geometries, shp_crs):
     out_txt = os.path.join(result_dir, f"{var_cn}_{res_name}.txt")
     write_txt(out_txt, xs, ys, values)
 
-    print(f"完成：{out_txt}，共写入 {len(xs)} 个像元")
+    # print(f"完成：{out_txt}，共写入 {len(xs)} 个像元")
 
 
 def main():
