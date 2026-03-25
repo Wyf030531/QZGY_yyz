@@ -15,8 +15,8 @@ import rasterio
 from rasterio.features import geometry_mask
 import fiona
 from shapely.geometry import shape, mapping
-from shapely.ops import transform as shp_transform
-from pyproj import Transformer
+# from shapely.ops import transform as shp_transform
+# from pyproj import Transformer
 
 
 # =========================
@@ -65,11 +65,11 @@ def read_shapefile_geometries(shp_file):
             geometries.append(geom)
     return geometries, shp_crs
 
-
+"""
 def reproject_geometries(geometries, src_crs, dst_crs):
-    """
+    
     将 shp 几何从 src_crs 转到 dst_crs
-    """
+    
     if not src_crs or not dst_crs:
         return geometries
 
@@ -85,7 +85,7 @@ def reproject_geometries(geometries, src_crs, dst_crs):
         new_geom = shp_transform(transformer.transform, geom)
         reprojected.append(new_geom)
     return reprojected
-
+"""
 
 def get_monthly_tif_list(folder, var_code, res_name):
     """
@@ -118,9 +118,11 @@ def build_inside_pixel_index(ref_tif, shp_geometries, shp_crs):
     基于参考 tif 和 shp，得到范围内所有像元的位置索引、中心点坐标
     顺序：从上到下、从左到右（即 row 升序，col 升序）
 
+    前提：shp 与 tif 已确认同为 EPSG:4326，不做任何重投影
     返回：
     rows_sorted, cols_sorted, xs, ys, ref_profile
     """
+
     with rasterio.open(ref_tif) as src:
         transform = src.transform
         raster_crs = src.crs
@@ -129,13 +131,13 @@ def build_inside_pixel_index(ref_tif, shp_geometries, shp_crs):
         nodata = src.nodata
         band1 = src.read(1)
 
-        # shp 投影到 raster CRS
-        shp_geoms_proj = reproject_geometries(shp_geometries, shp_crs, raster_crs)
+        print(f"    参考栅格 CRS: {raster_crs}")
+        print(f"    shp CRS: {shp_crs}")
 
-        # 转成 GeoJSON mapping
-        shp_geojson = [mapping(g) for g in shp_geoms_proj]
+        # 直接使用原始 shp 几何
+        shp_geojson = [mapping(g) for g in shp_geometries]
 
-        # True 表示范围外，所以 invert=True 才是范围内为 True
+        # True 表示范围内（因为 invert=True）
         inside_mask = geometry_mask(
             shp_geojson,
             transform=transform,
@@ -147,7 +149,6 @@ def build_inside_pixel_index(ref_tif, shp_geometries, shp_crs):
         if nodata is not None:
             valid_mask = inside_mask & (band1 != nodata)
         else:
-            # 若无 nodata 定义，则保留所有范围内像元
             valid_mask = inside_mask
 
         rows, cols = np.where(valid_mask)
@@ -157,7 +158,7 @@ def build_inside_pixel_index(ref_tif, shp_geometries, shp_crs):
         rows_sorted = rows[order]
         cols_sorted = cols[order]
 
-        # 计算中心点坐标
+        # 计算像元中心点坐标（仍为 EPSG:4326 经纬度）
         xs, ys = rasterio.transform.xy(transform, rows_sorted, cols_sorted, offset="center")
         xs = np.array(xs)
         ys = np.array(ys)
@@ -177,6 +178,8 @@ def extract_monthly_values(tif_list, rows, cols):
 
     for i, tif in enumerate(tif_list):
         with rasterio.open(tif) as src:
+            print(f"正在读取: {tif}")
+
             arr = src.read(1)
             nodata = src.nodata
 
@@ -240,6 +243,7 @@ def process_one_variable(res_name, var_code, var_cn, shp_geometries, shp_crs):
     out_txt = os.path.join(result_dir, f"{var_cn}_{res_name}.txt")
     write_txt(out_txt, xs, ys, values)
 
+    print(f"{var_cn}_{res_name} 完成，共 {len(xs)} 个像元")
     # print(f"完成：{out_txt}，共写入 {len(xs)} 个像元")
 
 
