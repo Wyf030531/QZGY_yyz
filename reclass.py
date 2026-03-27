@@ -29,7 +29,7 @@ import openpyxl
 # =========================
 tif_path = r"F:\wyf\数据存储\组内数据\严艳梓老师合作论文相关\veg\222\veg100w.tif"
 excel_path = r"F:\wyf\数据存储\组内数据\严艳梓老师合作论文相关\veg\植被类型代码表.xlsx"
-out_tif = r"F:\wyf\数据存储\组内数据\严艳梓老师合作论文相关\veg\222\result\veg100w_reclass_guancong.tif"
+out_tif = r"F:\wyf\数据存储\组内数据\严艳梓老师合作论文相关\veg\222\result\veg100w_reclass_ZKguancong.tif"
 
 
 # =========================
